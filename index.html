@@ -871,6 +871,7 @@
               <div style="display: flex; justify-content: space-between; font-size: 0.9rem;"><span>🧫 Lievito Rinfresco:</span> <strong id="resRinfrescoLievito" style="color: #2E7D32;">0 g</strong></div>  
               <div style="display: flex; justify-content: space-between; font-size: 0.9rem;"><span>🍯 Malto Rinfresco:</span> <strong id="resRinfrescoMalto" style="color: #E65100;">0 g</strong></div>  
               <div style="display: flex; justify-content: space-between; font-size: 0.9rem;"><span>🧂 Sale di Rinfresco:</span> <strong id="resRinfrescoSale">0 g</strong></div>  
+              <div style="display: flex; justify-content: space-between; font-size: 0.9rem;"><span>🫒 Olio di Rinfresco:</span> <strong id="resRinfrescoOlio" style="color: #FF5722;">0 g</strong></div>  
             </div>  
   
             <div class="result-item" style="border-left: 4px solid var(--accent-green);" id="itemLievitoFrescoStandard">  
@@ -1084,6 +1085,7 @@
     const resRinfrescoLievito = document.getElementById('resRinfrescoLievito');  
     const resRinfrescoMalto = document.getElementById('resRinfrescoMalto');  
     const resRinfrescoSale = document.getElementById('resRinfrescoSale');  
+    const resRinfrescoOlio = document.getElementById('resRinfrescoOlio');  
     const itemLievitoFrescoStandard = document.getElementById('itemLievitoFrescoStandard');  
     const itemLievitoSeccoStandard = document.getElementById('itemLievitoSeccoStandard');  
     const standardWaterBox = document.getElementById('standardWaterBox');  
@@ -1216,9 +1218,10 @@
       saleLitro.value = 45;  
       hintSale.innerText = 'Sale su acqua totale (40/50g)';  
 
-      olioPercent.value = 0;  
-      olioPercent.disabled = true;  
-      hintOlio.innerText = '🔒 Assente nella Biga Classica';  
+      // Olio sbloccato anche in modalità Biga per la teglia
+      olioPercent.value = 2;  
+      olioPercent.disabled = false;  
+      hintOlio.innerText = 'Olio inserito nel rinfresco (es. 2% per teglia)';  
 
       lblOreTA.innerText = 'Ore Appretto Finale (Sincronizzato)';  
       oreTA.value = 4;  
@@ -1533,6 +1536,7 @@
         const rinfrescoFarina = farina - bigaFarina;  
         const rinfrescoAcqua = acqua - bigaAcqua;  
         const rinfrescoSale = sale;  
+        const rinfrescoOlio = olio; // L'olio va interamente nel rinfresco  
   
         let tempAcquaRinfresco = (3 * tTarget) - bTargetT - tFarina - attr;  
 
@@ -1559,6 +1563,7 @@
         resRinfrescoLievito.innerText = `${lievitoRinfresco.toFixed(2)} g`;  
         resRinfrescoMalto.innerText = `${maltoRinfresco.toFixed(1)} g`;  
         resRinfrescoSale.innerText = rinfrescoSale.toFixed(1) + ' g';  
+        resRinfrescoOlio.innerText = rinfrescoOlio.toFixed(1) + ' g';  
       }  
   
       const fattoreTempo = 24.3 / Math.max(4, oreTotaliEq);  
