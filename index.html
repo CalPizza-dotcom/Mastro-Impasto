@@ -1521,50 +1521,18 @@
 
       const wTargetCalcolato = calcolaMixFarine(farina, oreTotaliEq, rawH);  
 
-      if (isBigaMode) {  
-        const pBiga = (parseFloat(bigaPerc.value) || 100) / 100;  
-        const bIdro = (parseFloat(bigaIdro.value) || 44) / 100;  
-        const bTemp = parseFloat(bigaTemp.value) || 18;  
-        const bTargetT = parseFloat(bigaTargetTemp.value) || 20;  
-        const bValW = parseFloat(bigaW.value) || 380;  
-  
-        const bigaFarina = farina * pBiga;  
-        const bigaAcqua = bigaFarina * bIdro;  
-        let lievitoBiga = bigaFarina * 0.01;  
-        let tempAcquaBiga = (3 * bTargetT) - bTemp - tFarina - attr;  
-  
-        const rinfrescoFarina = farina - bigaFarina;  
-        const rinfrescoAcqua = acqua - bigaAcqua;  
-        const rinfrescoSale = sale;  
-        const rinfrescoOlio = olio; // L'olio va interamente nel rinfresco  
-  
-        let tempAcquaRinfresco = (3 * tTarget) - bTargetT - tFarina - attr;  
-
-        const apprettoH = parseFloat(durataAppretto.value) || 8;  
-        const tAmb = parseFloat(tempTA.value) || 20;  
-        const tFin = parseFloat(tempTarget.value) || 24;  
-          
-        let fattoreTermico = tFin / 20;    
-        let lievitoRinfresco = (rinfrescoFarina / 1000) * (8 / Math.max(1, apprettoH)) * (20 / Math.max(10, tAmb)) * fattoreTermico * 2.62;  
-        lievitoRinfresco = Math.max(0.1, lievitoRinfresco);  
-
-        let maltoRinfresco = rinfrescoFarina * 0.0089;  
-  
-        resBigaFarina.innerText = bigaFarina.toFixed(0) + ' g';  
-        resBigaWDisplay.innerText = `W ${bValW}`;  
-        resBigaAcqua.innerText = bigaAcqua.toFixed(0) + ' g';  
-        resBigaLievito.innerText = `${lievitoBiga.toFixed(2)} g`;  
-        resBigaTempAcqua.innerText = tempAcquaBiga.toFixed(1) + ' °C';  
-  
-        resRinfrescoFarina.innerText = rinfrescoFarina.toFixed(0) + ' g';  
-        resRinfrescoWDisplay.innerText = `W ${wTargetCalcolato}`;  
-        resRinfrescoAcqua.innerText = rinfrescoAcqua.toFixed(0) + ' g';  
-        resRinfrescoTempAcqua.innerText = tempAcquaRinfresco.toFixed(1) + ' °C';  
-        resRinfrescoLievito.innerText = `${lievitoRinfresco.toFixed(2)} g`;  
-        resRinfrescoMalto.innerText = `${maltoRinfresco.toFixed(1)} g`;  
-        resRinfrescoSale.innerText = rinfrescoSale.toFixed(1) + ' g';  
-        resRinfrescoOlio.innerText = rinfrescoOlio.toFixed(1) + ' g';  
-      }  
+      <div class="form-row">  
+  <div class="form-group">  
+    <label>Temp. Biga (°C)</label>  
+    <input type="number" id="bigaTemp" value="18" min="12" max="30" step="0.5" />  
+    <span class="hint">Ambiente di fermentazione biga</span>  
+  </div>  
+  <div class="form-group">  
+    <label>Ore di Fermentazione Biga</label>  
+    <input type="number" id="bigaOre" value="18" min="8" max="48" step="1" />  
+    <span class="hint">Es. 16, 18 o 24 ore</span>  
+  </div>  
+</div> 
   
       const fattoreTempo = 24.3 / Math.max(4, oreTotaliEq);  
       const fattoreTemp = 17 / Math.max(5, tTA);  
