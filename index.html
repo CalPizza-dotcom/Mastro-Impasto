@@ -514,7 +514,7 @@
           <div class="form-group">  
             <label>Coeff. Macchina / Attrito (°C)</label>  
             <input type="number" id="attrito" value="18" min="0" max="25" step="1" />  
-            <span class="hint">0 a mano, 2-5 planetaria, 15-18 spirale rapida</span>  
+            <span class="hint">0 a mano, 2-5 planetaria, 15-18 spirale rapida (impasto lungo)</span>  
           </div>  
         </div>  
 
@@ -563,10 +563,15 @@
           </div>  
 
           <div class="form-row" style="margin-top: 10px;">  
-            <div class="form-group" style="grid-column: span 2;">  
+            <div class="form-group">  
               <label>Forza Farina Biga (W)</label>  
               <input type="number" id="bigaW" value="380" min="300" max="420" step="10" />  
               <span class="hint">Es. Manitoba / W380</span>  
+            </div>  
+            <div class="form-group">  
+              <label>Attrito Impasto Biga (°C)</label>  
+              <input type="number" id="bigaAttrito" value="6" min="0" max="25" step="1" />  
+              <span class="hint">Lavorazione breve (es. 5-6°C spirale)</span>  
             </div>  
           </div>  
         </div>  
@@ -835,7 +840,7 @@
       <!-- COLONNA 2: RISULTATI & CONDIMENTI -->  
       <div class="right-col">  
         
-        <!-- INIZIO AREA DA STAMPARE (SEZIONE 3 E 4) -->
+        <!-- INIZIO AREA DA STAMPARE (SEZIONE 3 E 4) -->  
         <div id="area-stampa">
 
           <!-- RISULTATI PESI -->  
@@ -1082,6 +1087,7 @@
     const bigaOre = document.getElementById('bigaOre');  
     const bigaTargetTemp = document.getElementById('bigaTargetTemp');  
     const bigaW = document.getElementById('bigaW');  
+    const bigaAttrito = document.getElementById('bigaAttrito');  
     const bigaResultsBox = document.getElementById('bigaResultsBox');  
     const resBigaFarina = document.getElementById('resBigaFarina');  
     const resBigaWDisplay = document.getElementById('resBigaWDisplay');  
@@ -1279,6 +1285,7 @@
       saleLitro.value = 43;  
       olioPercent.value = 0;  
       attrito.value = 18;  
+      bigaAttrito.value = 6;  
       oreTA.value = 8;  
       tempTA.value = 20;  
       oreFrigo.value = 0;  
@@ -1537,14 +1544,16 @@
         const bTemp = parseFloat(bigaTemp.value) || 18;  
         const bTargetT = parseFloat(bigaTargetTemp.value) || 20;  
         const bValW = parseFloat(bigaW.value) || 380;  
+        const bAttr = parseFloat(bigaAttrito.value);
+        const attrBigaEff = Number.isNaN(bAttr) ? 6 : bAttr;
   
         const bigaFarina = farina * pBiga;  
         const bigaAcqua = bigaFarina * bIdro;  
         let lievitoBiga = bigaFarina * 0.01;  
         
-        // Calcolo della temperatura acqua biga tenendo conto della temperatura stanza impasto
+        // Calcolo della temperatura acqua biga tenendo conto della temperatura stanza impasto e dell'attrito biga
         const bTempStanza = parseFloat(document.getElementById('bigaTempStanza')?.value) || tTA;
-        let tempAcquaBiga = (3 * bTargetT) - bTempStanza - tFarina - attr;  
+        let tempAcquaBiga = (3 * bTargetT) - bTempStanza - tFarina - attrBigaEff;  
   
         const rinfrescoFarina = farina - bigaFarina;  
         const rinfrescoAcqua = acqua - bigaAcqua;  
