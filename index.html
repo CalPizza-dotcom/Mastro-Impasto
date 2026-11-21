@@ -151,6 +151,19 @@
       border-color: var(--primary-dark);  
       box-shadow: 0 6px 15px rgba(255, 87, 34, 0.3);  
     }  
+    .btn-preset-lm {  
+      border-color: #A5D6A7;  
+      color: #2E7D32;  
+    }  
+    .btn-preset-lm:hover {  
+      background: #E8F5E9;  
+    }  
+    .btn-preset-lm.active {  
+      background: #2E7D32;  
+      color: white;  
+      border-color: #1B5E20;  
+      box-shadow: 0 6px 15px rgba(46, 125, 50, 0.3);  
+    }  
     .btn-preset-reset {  
       border-color: #90CAF9;  
       color: #1565C0;  
@@ -432,7 +445,7 @@
     <option value="Caputo Nuvola (0)">W 270 - Contemporanea canotto (12-24h)</option>  
     <option value="Caputo Cuoco / Chef Rossa">W 310 - Lunga maturazione (24-48h)</option>  
     <option value="Caputo Nuvola Super">W 325 - Alta idratazione e prefermenti</option>  
-    <option value="Caputo Manitoba Oro">W 375 - Tagli e lunghissima maturazione</option>  
+    <option value="Caputo Manitoba Oro">W 380 - Tagli, biga e lievito madre</option>  
     <option value="5 Stagioni Napoletana">W 300 - Pizza Napoletana STG</option>  
     <option value="5 Stagioni Superiore">W 330 - Lunga lievitazione</option>  
     <option value="5 Stagioni Manitoba">W 390 - Molto forte per biga e rinforzo</option>  
@@ -443,6 +456,7 @@
     <option value="Polselli Super">W 330 - Teglia e frigo</option>  
     <option value="Petra 5037 Pizza">W 300 - Contemporanea e alta idratazione</option>  
     <option value="Petra 3 (Tipo 1)">W 280 - Macinata a pietra aromatica</option>  
+    <option value="Farina Integrale">W 240 - Spinta e minerali lievito madre</option>  
     <option value="Spadoni Gran Mugnaio Pizza">W 200 - Lievitazioni rapide</option>  
     <option value="Casillo Origine Pizza">W 280 - Grano 100% italiano</option>  
   </datalist>  
@@ -452,7 +466,7 @@
   <div class="container">  
     <header>  
       <h1>🍕 MastroImpasto</h1>  
-      <p>Calcola dosaggi, idratazione, temperature, forza farina (W), biga e condimenti!</p>  
+      <p>Calcola dosaggi, idratazione, temperature, forza farina (W), biga, lievito madre e condimenti!</p>  
     </header>  
   
     <div class="grid">  
@@ -469,12 +483,135 @@
             <button type="button" class="btn-preset" id="btnContemporanea">✨ Pizza Contemporanea</button>  
             <button type="button" class="btn-preset" id="btnBiga">🥖 Biga Metodo Classico</button>  
             <button type="button" class="btn-preset" id="btnTegliaPreset">📐 Pizza in Teglia</button>  
-            <button type="button" class="btn-preset btn-preset-reset" id="btnPersonalizza" style="grid-column: span 2;">⚙️ Personalizza</button>  
+            <button type="button" class="btn-preset btn-preset-lm" id="btnLievitoMadre">🫙 Lievito Madre</button>  
+            <button type="button" class="btn-preset btn-preset-reset" id="btnPersonalizza">⚙️ Personalizza</button>  
+          </div>  
+        </div>  
+
+        <!-- SEZIONE DEDICATA: GESTIONE & RINFRESCO LIEVITO MADRE -->  
+        <div id="lmCardSection" class="card" style="margin-bottom: 25px; display: none; border-color: #66BB6A; background: #F1F8E9;">  
+          <div class="card-title" style="color: #2E7D32; border-bottom-color: #C8E6C9;">  
+            🫙 Gestione & Rinfresco Lievito Madre  
+          </div>  
+
+          <!-- 1. PESO TARGET E IDRATAZIONE -->  
+          <div class="form-row">  
+            <div class="form-group">  
+              <label>Totale Lievito Desiderato (g)</label>  
+              <input type="number" id="lmPesoTotale" value="300" min="50" max="5000" step="10" />  
+              <span class="hint">Es. 300g finiti dopo il rinfresco</span>  
+            </div>  
+            <div class="form-group">  
+              <label>Idratazione Lievito (%)</label>  
+              <input type="number" id="lmIdro" value="44" min="38" max="100" step="1" />  
+              <span class="hint">44% mantenimento lungo, 48-50% spinta</span>  
+            </div>  
+          </div>  
+
+          <!-- 2. RAPPORTO E FARINA INTEGRALE -->  
+          <div class="form-row">  
+            <div class="form-group">  
+              <label>Rapporto su Farina</label>  
+              <select id="lmRapporto">  
+                <option value="1" selected>1 : 1 (Lievito = Farina nuova)</option>  
+                <option value="1.2">1 : 1,2 (Mantenimento lungo)</option>  
+                <option value="1.5">1 : 1,5 (Rinfresco forte)</option>  
+                <option value="2">1 : 2 (Lievito = 50% Farina)</option>  
+              </select>  
+              <span class="hint">Calcolato sempre sul peso della farina</span>  
+            </div>  
+            <div class="form-group">  
+              <label>% Farina Integrale</label>  
+              <input type="number" id="lmPercIntegrale" value="0" min="0" max="100" step="5" />  
+              <span class="hint">Es. 20% per recupero/spinta, 0% bianco</span>  
+            </div>  
+          </div>  
+
+          <!-- 3. FORZA FARINA (W) RINFRESCO -->  
+          <div class="form-row">  
+            <div class="form-group">  
+              <label>Farina Principale</label>  
+              <input type="text" id="lmFarinaNome" list="elencoFarine" value="Caputo Manitoba Oro" />  
+              <span class="hint">Default: Caputo Manitoba Oro</span>  
+            </div>  
+            <div class="form-group">  
+              <label>Forza Farina (W)</label>  
+              <input type="number" id="lmFarinaW" value="380" min="150" max="450" step="5" />  
+              <span class="hint">Integrale calcolata a W 240</span>  
+            </div>  
+          </div>  
+
+          <!-- 4. TEMPERATURE E ATTRITO -->  
+          <div class="form-row">  
+            <div class="form-group">  
+              <label>Temp. Lievito Partenza (°C)</label>  
+              <input type="number" id="lmTempPartenza" value="16" min="4" max="32" step="0.5" />  
+              <span class="hint">Es. 16°C cantinetta o 28°C cella</span>  
+            </div>  
+            <div class="form-group">  
+              <label>Temp. Target Chiusura (°C)</label>  
+              <input type="number" id="lmTempTarget" value="24" min="18" max="30" step="0.5" />  
+              <span class="hint">Ottimale 24°C (o 27-28°C spinta)</span>  
+            </div>  
+          </div>  
+
+          <div class="form-row">  
+            <div class="form-group">  
+              <label>Temp. Stanza / Farina (°C)</label>  
+              <input type="number" id="lmTempStanza" value="19" min="10" max="35" step="0.5" />  
+              <span class="hint">Temperatura ambiente e sacco farina</span>  
+            </div>  
+            <div class="form-group">  
+              <label>Attrito Impastamento (°C)</label>  
+              <input type="number" id="lmAttrito" value="6" min="0" max="20" step="1" />  
+              <span class="hint">0 mano, 5-6 spirale breve, 10 lungo</span>  
+            </div>  
+          </div>  
+
+          <!-- 5. STAZIONAMENTO, ORARIO RIPRESA E GESTIONE ESUBERO -->  
+          <div class="form-row">  
+            <div class="form-group">  
+              <label>Ora Inizio / Chiusura</label>  
+              <input type="time" id="lmOraInizio" value="22:00" />  
+              <span class="hint">Quando metti il lievito a riposare</span>  
+            </div>  
+            <div class="form-group">  
+              <label>Temp. Stazionamento (°C)</label>  
+              <input type="number" id="lmTempRiposo" value="16" min="4" max="30" step="0.5" />  
+              <span class="hint">16°C mantenimento, 24°C notte, 28°C cella</span>  
+            </div>  
+          </div>  
+
+          <div class="form-row">  
+            <div class="form-group">  
+              <label>Ore Previste Sosta</label>  
+              <input type="number" id="lmOreSosta" value="21" min="2" max="48" step="0.5" />  
+              <span class="hint">Es. 20-22h a 16°C, 4h a 28°C</span>  
+            </div>  
+            <div class="form-group">  
+              <label>Lievito in Barattolo (g)</label>  
+              <input type="number" id="lmDisponibile" value="200" min="0" max="5000" step="5" />  
+              <span class="hint">Per calcolare subito l'esubero</span>  
+            </div>  
+          </div>  
+
+          <!-- 6. MONITORAGGIO pH & CICLI -->  
+          <div class="form-row">  
+            <div class="form-group">  
+              <label>pH Rilevato (Obiettivo 3,90-3,95)</label>  
+              <input type="number" id="lmPhRilevato" value="3.95" min="3.40" max="5.50" step="0.01" />  
+              <span class="hint">Controllo acidità pre/post sosta</span>  
+            </div>  
+            <div class="form-group">  
+              <label>Rinfresco Ciclo N°</label>  
+              <input type="number" id="lmNumCiclo" value="1" min="1" max="10" step="1" />  
+              <span class="hint">Es. rinfreschi consecutivi (1-6)</span>  
+            </div>  
           </div>  
         </div>  
 
         <!-- SEZIONE 1: PARAMETRI IMPASTO -->  
-        <div class="card">  
+        <div class="card" id="mainParamsCard">  
           <div class="card-title">⚙️ 1. Parametri Impasto</div>  
   
           <div class="form-row">  
@@ -796,7 +933,7 @@
         </div>  
   
         <!-- SEZIONE 2: TEMPI E TEMPERATURE -->  
-        <div class="card" style="margin-top: 25px;">  
+        <div class="card" id="timeTempCard" style="margin-top: 25px;">  
           <div class="card-title">⏳ 2. Tempi e Temperature</div>  
           <div class="form-row">  
             <div class="form-group">  
@@ -843,8 +980,64 @@
         <!-- INIZIO AREA DA STAMPARE (SEZIONE 3 E 4) -->  
         <div id="area-stampa">
 
-          <!-- RISULTATI PESI -->  
-          <div class="card results-card">  
+          <!-- RISULTATI LIEVITO MADRE (VISIBILE SOLO IN MODALITÀ LIEVITO MADRE) -->  
+          <div id="lmResultsCard" class="card results-card" style="display: none; border-color: #66BB6A; background: linear-gradient(135deg, #F1F8E9 0%, #FFFFFF 100%);">  
+            <div class="card-title" style="color: #2E7D32; border-bottom-color: #C8E6C9;">🫙 Scheda Rinfresco Lievito Madre</div>  
+
+            <div class="result-item" style="border-left: 5px solid #2E7D32;">  
+              <span class="label">Peso Totale Lievito Pronto</span>  
+              <span class="val" id="resLmTotale" style="color: #2E7D32;">300 g</span>  
+            </div>  
+            <div class="result-item">  
+              <span class="label">🫙 Lievito Madre da Prelevare</span>  
+              <span class="val" id="resLmMadre" style="color: #4E342E;">104,2 g</span>  
+            </div>  
+            <div class="result-item">  
+              <span class="label" id="lblResLmFarinaBianca">🌾 Farina Principale (Caputo Oro)</span>  
+              <span class="val" id="resLmFarinaBianca">104,2 g</span>  
+            </div>  
+            <div class="result-item" id="rowResLmIntegrale" style="display: none;">  
+              <span class="label">🌾 Farina Integrale</span>  
+              <span class="val" id="resLmFarinaIntegrale" style="color: #8D6E63;">0 g</span>  
+            </div>  
+            <div class="result-item">  
+              <span class="label">💧 Acqua da Aggiungere</span>  
+              <span class="val" id="resLmAcqua" style="color: #1565C0;">91,7 g</span>  
+            </div>  
+            <div class="result-item" style="background: #F3E5F5; border-color: #E1BEE7;">  
+              <span class="label">💪 Forza Media Mix (W)</span>  
+              <span class="val" id="resLmWMedio" style="color: #7B1FA2;">W 380</span>  
+            </div>  
+            <div class="result-item" id="rowResLmEsubero" style="background: #FFF8E1; border-color: #FFE082;">  
+              <span class="label">🥣 Esubero Rimanente</span>  
+              <span class="val" id="resLmEsubero" style="color: #EF6C00;">95,8 g</span>  
+            </div>  
+
+            <!-- TEMPERATURA ACQUA RINFRESCO -->  
+            <div class="highlight-box" style="margin-top: 12px;">  
+              <div style="font-weight: 700; color: #1565C0;">🧊 Temperatura Acqua Rinfresco</div>  
+              <div class="temp-val" id="resLmTempAcqua">31,0 °C</div>  
+              <div id="resLmWaterNote" style="font-size: 0.8rem; color: #555; margin-top: 4px;">Calcolata per chiudere a 24,0 °C</div>  
+            </div>  
+
+            <!-- ORARIO DI RIPRESA, TENUTA E OBIETTIVO pH -->  
+            <div style="margin-top: 14px; background: #FFFFFF; border: 2px solid #C8E6C9; border-radius: 14px; padding: 14px;">  
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #C8E6C9;">  
+                <span style="font-weight: 800; color: #2E7D32;">⏰ Ora di Ripresa Consigliata</span>  
+                <span id="resLmOraRipresa" style="font-family: 'Fredoka', cursive; font-size: 1.45rem; color: #1B5E20; background: #E8F5E9; padding: 4px 12px; border-radius: 10px;">19:00</span>  
+              </div>  
+              <div style="font-size: 0.88rem; color: #37474F; line-height: 1.45;">  
+                <div id="resLmTenutaInfo"><strong>Tenuta stimata:</strong> ~20-22 ore a 16°C (44% idro).</div>  
+                <div id="resLmWCheck" style="margin-top: 4px;"><strong>Forza farina:</strong> OK per la durata impostata.</div>  
+                <div id="resLmPhStatus" style="margin-top: 6px; padding: 8px 10px; border-radius: 8px; background: #E8F5E9; color: #2E7D32;">  
+                  <strong>🎯 Check pH (3,95) — Ciclo #1:</strong> Acidità in equilibrio ottimale per mantenimento/uso.  
+                </div>  
+              </div>  
+            </div>  
+          </div>  
+
+          <!-- RISULTATI PESI (IMPASTI PIZZA / BIGA) -->  
+          <div class="card results-card" id="standardResultsCard">  
             <div class="card-title">📊 3. Ingredienti e Pesi</div>  
             <div class="result-item" style="border-left: 5px solid var(--primary);">  
               <span class="label">Peso Impasto Totale</span>  
@@ -922,7 +1115,7 @@
           </div>  
   
           <!-- DOSAGGIO CONDIMENTI -->  
-          <div class="card" style="margin-top: 25px;">  
+          <div class="card" id="condimentiCard" style="margin-top: 25px;">  
             <div class="card-title">🍅 4. Condimenti (Pelati & Mozzarella)</div>  
             <div class="form-row">  
               <div class="form-group">  
@@ -975,7 +1168,7 @@
       "Caputo Nuvola (0)": 270,  
       "Caputo Cuoco / Chef Rossa": 310,  
       "Caputo Nuvola Super": 325,  
-      "Caputo Manitoba Oro": 375,  
+      "Caputo Manitoba Oro": 380,  
       "5 Stagioni Napoletana": 300,  
       "5 Stagioni Superiore": 330,  
       "5 Stagioni Manitoba": 390,  
@@ -986,6 +1179,7 @@
       "Polselli Super": 330,  
       "Petra 5037 Pizza": 300,  
       "Petra 3 (Tipo 1)": 280,  
+      "Farina Integrale": 240,  
       "Spadoni Gran Mugnaio Pizza": 200,  
       "Casillo Origine Pizza": 280  
     };  
@@ -1073,11 +1267,12 @@
     const timelineStandard = document.getElementById('timelineStandard');  
     const timelineBiga = document.getElementById('timelineBiga');  
 
-    // Biga elements  
+    // Biga & Preset elements  
     const btnNapoletana = document.getElementById('btnNapoletana');  
     const btnContemporanea = document.getElementById('btnContemporanea');  
     const btnBiga = document.getElementById('btnBiga');  
     const btnTegliaPreset = document.getElementById('btnTegliaPreset');  
+    const btnLievitoMadre = document.getElementById('btnLievitoMadre');  
     const btnPersonalizza = document.getElementById('btnPersonalizza');  
     const bigaCardSection = document.getElementById('bigaCardSection');  
     const bigaPerc = document.getElementById('bigaPerc');  
@@ -1106,12 +1301,55 @@
     const itemLievitoSeccoStandard = document.getElementById('itemLievitoSeccoStandard');  
     const standardWaterBox = document.getElementById('standardWaterBox');  
     const rowFrigoMain = document.getElementById('rowFrigoMain');  
+
+    // Lievito Madre elements  
+    const lmCardSection = document.getElementById('lmCardSection');  
+    const lmResultsCard = document.getElementById('lmResultsCard');  
+    const mainParamsCard = document.getElementById('mainParamsCard');  
+    const timeTempCard = document.getElementById('timeTempCard');  
+    const standardResultsCard = document.getElementById('standardResultsCard');  
+    const condimentiCard = document.getElementById('condimentiCard');  
+
+    const lmPesoTotale = document.getElementById('lmPesoTotale');  
+    const lmIdro = document.getElementById('lmIdro');  
+    const lmRapporto = document.getElementById('lmRapporto');  
+    const lmPercIntegrale = document.getElementById('lmPercIntegrale');  
+    const lmFarinaNome = document.getElementById('lmFarinaNome');  
+    const lmFarinaW = document.getElementById('lmFarinaW');  
+    const lmTempPartenza = document.getElementById('lmTempPartenza');  
+    const lmTempTarget = document.getElementById('lmTempTarget');  
+    const lmTempStanza = document.getElementById('lmTempStanza');  
+    const lmAttrito = document.getElementById('lmAttrito');  
+    const lmOraInizio = document.getElementById('lmOraInizio');  
+    const lmTempRiposo = document.getElementById('lmTempRiposo');  
+    const lmOreSosta = document.getElementById('lmOreSosta');  
+    const lmDisponibile = document.getElementById('lmDisponibile');  
+    const lmPhRilevato = document.getElementById('lmPhRilevato');  
+    const lmNumCiclo = document.getElementById('lmNumCiclo');  
+
+    const resLmTotale = document.getElementById('resLmTotale');  
+    const resLmMadre = document.getElementById('resLmMadre');  
+    const lblResLmFarinaBianca = document.getElementById('lblResLmFarinaBianca');  
+    const resLmFarinaBianca = document.getElementById('resLmFarinaBianca');  
+    const rowResLmIntegrale = document.getElementById('rowResLmIntegrale');  
+    const resLmFarinaIntegrale = document.getElementById('resLmFarinaIntegrale');  
+    const resLmAcqua = document.getElementById('resLmAcqua');  
+    const resLmWMedio = document.getElementById('resLmWMedio');  
+    const rowResLmEsubero = document.getElementById('rowResLmEsubero');  
+    const resLmEsubero = document.getElementById('resLmEsubero');  
+    const resLmTempAcqua = document.getElementById('resLmTempAcqua');  
+    const resLmWaterNote = document.getElementById('resLmWaterNote');  
+    const resLmOraRipresa = document.getElementById('resLmOraRipresa');  
+    const resLmTenutaInfo = document.getElementById('resLmTenutaInfo');  
+    const resLmWCheck = document.getElementById('resLmWCheck');  
+    const resLmPhStatus = document.getElementById('resLmPhStatus');  
   
     const resPelati = document.getElementById('resPelati');  
     const resSalePelati = document.getElementById('resSalePelati');  
     const resMozzarella = document.getElementById('resMozzarella');  
   
     let isBigaMode = false;  
+    let isLmMode = false;  
     let userManuallyChangedBigaIdro = false;  
 
     const domani20 = new Date();  
@@ -1120,7 +1358,7 @@
     orarioInfornata.value = domani20.toISOString().slice(0, 16);  
 
     function setActivePresetBtn(btnActive) {  
-      [btnNapoletana, btnContemporanea, btnBiga, btnTegliaPreset, btnPersonalizza].forEach(b => b.classList.remove('active'));  
+      [btnNapoletana, btnContemporanea, btnBiga, btnTegliaPreset, btnLievitoMadre, btnPersonalizza].forEach(b => b.classList.remove('active'));  
       if (btnActive) btnActive.classList.add('active');  
     }  
 
@@ -1136,8 +1374,22 @@
       saleLitro.disabled = false;  
       btnToggleTeglia.disabled = false;  
       btnToggleAdvanced.disabled = false;  
+      btnToggleFarina.disabled = false;  
       isBigaMode = false;  
+      isLmMode = false;  
       userManuallyChangedBigaIdro = false;  
+
+      // Ripristina visibilità standard vs Lievito Madre
+      lmCardSection.style.display = 'none';  
+      lmResultsCard.style.display = 'none';  
+      mainParamsCard.style.display = 'block';  
+      timeTempCard.style.display = 'block';  
+      standardResultsCard.style.display = 'block';  
+      condimentiCard.style.display = 'block';  
+      btnToggleFarina.style.display = 'flex';  
+      btnToggleTeglia.style.display = 'flex';  
+      btnToggleAdvanced.style.display = 'flex';  
+
       bigaCardSection.style.display = 'none';  
       bigaResultsBox.style.display = 'none';  
       itemLievitoFrescoStandard.style.display = 'flex';  
@@ -1234,7 +1486,6 @@
       saleLitro.value = 45;  
       hintSale.innerText = 'Sale su acqua totale (40/50g)';  
 
-      // Olio sbloccato anche in modalità Biga per la teglia
       olioPercent.value = 2;  
       olioPercent.disabled = false;  
       hintOlio.innerText = 'Olio inserito nel rinfresco (es. 2% per teglia)';  
@@ -1242,7 +1493,7 @@
       lblOreTA.innerText = 'Ore Appretto Finale (Sincronizzato)';  
       oreTA.value = 4;  
       oreTA.readOnly = true;  
-      hintOreTA.hint = 'Sincronizzato con la Modalità Avanzata';  
+      hintOreTA.innerText = 'Sincronizzato con la Modalità Avanzata';  
 
       oreFrigo.value = 0;  
       oreFrigo.disabled = true;  
@@ -1253,6 +1504,29 @@
       aggiornaIdratazioneBigaAuto();  
       calcolaTimeline();  
       calcola();  
+    });  
+
+    btnLievitoMadre.addEventListener('click', () => {  
+      setActivePresetBtn(btnLievitoMadre);  
+      sbloccaTuttiParametri();  
+      isLmMode = true;  
+
+      lmCardSection.style.display = 'block';  
+      lmResultsCard.style.display = 'block';  
+
+      // Nascondi le sezioni specifiche della pizza per un'interfaccia pulita sul Lievito Madre
+      mainParamsCard.style.display = 'none';  
+      timeTempCard.style.display = 'none';  
+      standardResultsCard.style.display = 'none';  
+      condimentiCard.style.display = 'none';  
+      farinaSection.style.display = 'none';  
+      tegliaSection.style.display = 'none';  
+      advancedSection.style.display = 'none';  
+      btnToggleFarina.style.display = 'none';  
+      btnToggleTeglia.style.display = 'none';  
+      btnToggleAdvanced.style.display = 'none';  
+
+      calcolaLievitoMadre();  
     });  
 
     function applicaImpostazioniTeglia() {  
@@ -1307,6 +1581,7 @@
     f1Nome.addEventListener('input', () => { checkAutoW(f1Nome, f1W); calcola(); });  
     f2Nome.addEventListener('input', () => { checkAutoW(f2Nome, f2W); calcola(); });  
     f3Nome.addEventListener('input', () => { checkAutoW(f3Nome, f3W); calcola(); });  
+    lmFarinaNome.addEventListener('input', () => { checkAutoW(lmFarinaNome, lmFarinaW); calcolaLievitoMadre(); });  
   
     btnToggleFarina.addEventListener('click', () => {  
       if (farinaSection.style.display === 'none') {  
@@ -1508,8 +1783,129 @@
     durataPuntata.addEventListener('input', () => { calcolaTimeline(); calcola(); });  
     durataAppretto.addEventListener('input', () => { calcolaTimeline(); calcola(); });  
     bigaOre.addEventListener('input', () => { calcolaTimeline(); calcola(); });  
+
+    // FUNZIONE DEDICATA AL LIEVITO MADRE
+    function calcolaLievitoMadre() {  
+      const pesoTot = parseFloat(lmPesoTotale.value) || 0;  
+      const idroPct = parseFloat(lmIdro.value) || 44;  
+      const h = idroPct / 100;  
+      const rapporto = parseFloat(lmRapporto.value) || 1;  
+      const percInt = Math.max(0, Math.min(100, parseFloat(lmPercIntegrale.value) || 0)) / 100;  
+      const nomeFarina = lmFarinaNome.value.trim() || 'Farina Principale';  
+      const wMain = parseFloat(lmFarinaW.value) || 380;  
+
+      const tPart = parseFloat(lmTempPartenza.value) || 16;  
+      const tTarg = parseFloat(lmTempTarget.value) || 24;  
+      const tStanza = parseFloat(lmTempStanza.value) || 19;  
+      const attrLm = parseFloat(lmAttrito.value);  
+      const attrEff = Number.isNaN(attrLm) ? 6 : attrLm;  
+
+      const oraInizioVal = lmOraInizio.value || '22:00';  
+      const tRiposo = parseFloat(lmTempRiposo.value) || 16;  
+      const oreSosta = parseFloat(lmOreSosta.value) || 21;  
+      const dispLm = parseFloat(lmDisponibile.value) || 0;  
+      const phVal = parseFloat(lmPhRilevato.value) || 3.95;  
+      const numCiclo = parseInt(lmNumCiclo.value, 10) || 1;  
+
+      // Scomposizione su peso totale desiderato e rapporto su farina (1 : R)
+      // PesoTot = LM + FarinaNuova + Acqua = LM * (1 + R + R * h)
+      const denom = 1 + rapporto + (rapporto * h);  
+      const qtaMadre = denom > 0 ? (pesoTot / denom) : 0;  
+      const qtaFarinaNuova = qtaMadre * rapporto;  
+      const qtaAcqua = qtaFarinaNuova * h;  
+
+      const qtaFarinaIntegrale = qtaFarinaNuova * percInt;  
+      const qtaFarinaBianca = qtaFarinaNuova - qtaFarinaIntegrale;  
+
+      // W medio della farina nuova aggiunta (integrale stimata a W 240)
+      const wIntegrale = 240;  
+      const wMixLm = Math.round((wMain * (1 - percInt)) + (wIntegrale * percInt));  
+
+      // Esubero
+      const esubero = Math.max(0, dispLm - qtaMadre);  
+
+      // Temperatura acqua: (3 * Target) - TempLievitoPartenza - TempFarina/Stanza - Attrito
+      const tempAcquaLm = (3 * tTarg) - tPart - tStanza - attrEff;  
+
+      // Calcolo orario di ripresa
+      const [hh, mm] = oraInizioVal.split(':').map(Number);  
+      const startMin = (hh || 0) * 60 + (mm || 0);  
+      const endMinTotal = Math.round(startMin + (oreSosta * 60));  
+      const endHH = Math.floor((endMinTotal % 1440) / 60);  
+      const endMM = endMinTotal % 60;  
+      const giorniDopo = Math.floor(endMinTotal / 1440);  
+      const oraRipresaStr = `${String(endHH).padStart(2, '0')}:${String(endMM).padStart(2, '0')}${giorniDopo > 0 ? ` (+${giorniDopo}g)` : ''}`;  
+
+      // Stima tenuta in base a temperatura, idratazione e rapporto
+      // Base: rapporto 1:1, 44% idro, 16°C -> ~21h
+      const fattoreTemp = Math.pow(1.13, 16 - tRiposo);  
+      const fattoreIdro = 1 + ((44 - idroPct) * 0.025);  
+      const fattoreRapp = 0.65 + (0.35 * rapporto);  
+      const oreStimateCentro = Math.max(2, 21 * fattoreTemp * fattoreIdro * fattoreRapp);  
+      const oreMin = Math.max(2, Math.round(oreStimateCentro - 1));  
+      const oreMax = Math.max(3, Math.round(oreStimateCentro + 1));  
+
+      // W consigliato per reggere la sosta
+      const oreEqTa = oreSosta * Math.pow(1.11, tRiposo - 20);  
+      const wConsigliato = Math.round(240 + (12 * Math.log(Math.max(2, oreEqTa))) + Math.max(0, (idroPct - 44) * 2));  
+
+      // Aggiornamento UI Risultati Lievito Madre
+      resLmTotale.innerText = pesoTot.toFixed(0) + ' g';  
+      resLmMadre.innerText = qtaMadre.toFixed(1) + ' g';  
+      lblResLmFarinaBianca.innerText = `🌾 ${nomeFarina} (${Math.round((1 - percInt) * 100)}%)`;  
+      resLmFarinaBianca.innerText = qtaFarinaBianca.toFixed(1) + ' g';  
+
+      if (percInt > 0) {  
+        rowResLmIntegrale.style.display = 'flex';  
+        resLmFarinaIntegrale.innerText = `${qtaFarinaIntegrale.toFixed(1)} g (${Math.round(percInt * 100)}%)`;  
+      } else {  
+        rowResLmIntegrale.style.display = 'none';  
+      }  
+
+      resLmAcqua.innerText = qtaAcqua.toFixed(1) + ' g';  
+      resLmWMedio.innerText = `W ${wMixLm}`;  
+      resLmEsubero.innerText = dispLm > 0 ? `${esubero.toFixed(1)} g` : '0 g';  
+
+      resLmTempAcqua.innerText = tempAcquaLm.toFixed(1) + ' °C';  
+      if (tempAcquaLm > 38) {  
+        resLmWaterNote.innerHTML = `<span style="color:#C62828; font-weight:700;">⚠️ Sopra 38°C: ferma l'acqua a 37-38°C per non stressare i lieviti e lascia salire in cella a ${tTarg}°C.</span>`;  
+      } else if (tempAcquaLm < 4) {  
+        resLmWaterNote.innerHTML = `<span style="color:#0D47A1; font-weight:700;">❄️ Acqua molto fredda: usa acqua da frigo (4°C) o un po' di ghiaccio tritato.</span>`;  
+      } else {  
+        resLmWaterNote.innerText = `Calcolata per chiudere a ${tTarg.toFixed(1)} °C (partenza ${tPart}°C, attrito ${attrEff}°C)`;  
+      }  
+
+      resLmOraRipresa.innerText = oraRipresaStr;  
+      resLmTenutaInfo.innerHTML = `<strong>Tenuta stimata a ${tRiposo}°C (${idroPct}% idro, 1:${rapporto}):</strong> ~${oreMin}-${oreMax} ore per arrivare al giusto pH (impostate: ${oreSosta}h).`;  
+
+      if (wMixLm >= wConsigliato - 20) {  
+        resLmWCheck.innerHTML = `<strong>Forza farina (W ${wMixLm}):</strong> ✅ Adeguata (consigliato ~W ${wConsigliato}) per reggere la sosta senza cedimenti.`;  
+      } else {  
+        resLmWCheck.innerHTML = `<strong>Forza farina (W ${wMixLm}):</strong> ⚠️ Un po' leggera per ${oreSosta}h (consigliato ~W ${wConsigliato}); valuta più Manitoba Oro.`;  
+      }  
+
+      // Valutazione pH
+      if (phVal >= 3.88 && phVal <= 4.02) {  
+        resLmPhStatus.style.background = '#E8F5E9';  
+        resLmPhStatus.style.color = '#2E7D32';  
+        resLmPhStatus.innerHTML = `<strong>🎯 Check pH (${phVal.toFixed(2)}) — Ciclo #${numCiclo}:</strong> Equilibrio ottimale (target 3,90–3,95). Pronto per l'uso o per un nuovo ciclo di mantenimento.`;  
+      } else if (phVal > 4.02) {  
+        resLmPhStatus.style.background = '#FFF8E1';  
+        resLmPhStatus.style.color = '#EF6C00';  
+        resLmPhStatus.innerHTML = `<strong>⏳ Check pH (${phVal.toFixed(2)}) — Ciclo #${numCiclo}:</strong> Ancora poco maturo (> 4,02). Allunga leggermente la sosta o tieni 1-2°C più caldo.`;  
+      } else {  
+        resLmPhStatus.style.background = '#FFEBEE';  
+        resLmPhStatus.style.color = '#C62828';  
+        resLmPhStatus.innerHTML = `<strong>⚠️ Check pH (${phVal.toFixed(2)}) — Ciclo #${numCiclo}:</strong> Tendenza acetica/acida (< 3,88). Anticipa la ripresa o riduci la temperatura di stazionamento.`;  
+      }  
+    }  
   
     function calcola() {  
+      if (isLmMode) {  
+        calcolaLievitoMadre();  
+        return;  
+      }  
+
       const n = parseFloat(numPanetti.value) || 0;  
       const p = parseFloat(pesoPanetto.value) || 0;  
       const rawH = parseFloat(idratazione.value) || 0;  
@@ -1544,15 +1940,14 @@
         const bTemp = parseFloat(bigaTemp.value) || 18;  
         const bTargetT = parseFloat(bigaTargetTemp.value) || 20;  
         const bValW = parseFloat(bigaW.value) || 380;  
-        const bAttr = parseFloat(bigaAttrito.value);
-        const attrBigaEff = Number.isNaN(bAttr) ? 6 : bAttr;
+        const bAttr = parseFloat(bigaAttrito.value);  
+        const attrBigaEff = Number.isNaN(bAttr) ? 6 : bAttr;  
   
         const bigaFarina = farina * pBiga;  
         const bigaAcqua = bigaFarina * bIdro;  
         let lievitoBiga = bigaFarina * 0.01;  
         
-        // Calcolo della temperatura acqua biga tenendo conto della temperatura stanza impasto e dell'attrito biga
-        const bTempStanza = parseFloat(document.getElementById('bigaTempStanza')?.value) || tTA;
+        const bTempStanza = parseFloat(document.getElementById('bigaTempStanza')?.value) || tTA;  
         let tempAcquaBiga = (3 * bTargetT) - bTempStanza - tFarina - attrBigaEff;  
   
         const rinfrescoFarina = farina - bigaFarina;  
@@ -1639,10 +2034,14 @@
       resMozzarella.innerText = mozzTot.toFixed(0) + ' g';  
     }  
   
-    document.querySelectorAll('input:not(#idratazione):not(#idratazioneSlider):not(#advTempTA):not(#advOreFrigo):not(#advTempFrigo):not(#f1Nome):not(#f2Nome):not(#f3Nome), select').forEach(el => {  
+    document.querySelectorAll('input:not(#idratazione):not(#idratazioneSlider):not(#advTempTA):not(#advOreFrigo):not(#advTempFrigo):not(#f1Nome):not(#f2Nome):not(#f3Nome):not(#lmFarinaNome), select').forEach(el => {  
       el.addEventListener('input', () => {  
-        calcolaTimeline();  
-        calcola();  
+        if (isLmMode) {  
+          calcolaLievitoMadre();  
+        } else {  
+          calcolaTimeline();  
+          calcola();  
+        }  
       });  
     });  
   
