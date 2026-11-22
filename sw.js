@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mastroimpasto-v3';
+const CACHE_NAME = 'mastroimpasto-v4';
 const ASSETS = [
   './',
   './index.html',
