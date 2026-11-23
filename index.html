@@ -727,7 +727,7 @@
 
           <div class="form-row">  
             <div class="form-group">  
-              <label>pH Rilevato (Obiettivo 3,90-3,95)</label>  
+              <label>pH Rilevato (3,95 manten. / 4,10 cella)</label>  
               <input type="number" id="lmPhRilevato" value="3.95" min="3.40" max="5.50" step="0.01" />  
               <span class="hint">Controllo acidità pre/post sosta</span>  
             </div>  
@@ -2297,12 +2297,24 @@
       startDateLm.setHours(hh || 0, mm || 0, 0, 0);
       lastLmTargetTimestamp = startDateLm.getTime() + (oreSosta * 3600000);
 
-      const fattoreTemp = Math.pow(1.13, 16 - tRiposo);  
-      const fattoreIdro = 1 + ((44 - idroPct) * 0.025);  
-      const fattoreRapp = 0.65 + (0.35 * rapporto);  
-      const oreStimateCentro = Math.max(2, 21 * fattoreTemp * fattoreIdro * fattoreRapp);  
-      const oreMin = Math.max(2, Math.round(oreStimateCentro - 1));  
-      const oreMax = Math.max(3, Math.round(oreStimateCentro + 1));  
+      const isModalitaCella = tRiposo >= 26;  
+      let oreMin, oreMax;  
+      if (isModalitaCella) {  
+        const fattoreTempSpinta = Math.pow(1.09, 28 - tRiposo);  
+        const fattoreIdroSpinta = 1 + ((50 - idroPct) * 0.02);  
+        const fattoreRappSpinta = 1 + ((rapporto - 1) * 0.31);  
+        const oreCentroSpinta = Math.max(2, 3.25 * fattoreTempSpinta * fattoreIdroSpinta * fattoreRappSpinta);  
+        oreMin = Math.max(2, Math.round((oreCentroSpinta - 0.25) * 2) / 2);  
+        oreMax = Math.max(oreMin + 0.5, Math.round((oreCentroSpinta + 0.25) * 2) / 2);  
+      } else {  
+        const fattoreTemp = Math.pow(1.13, 16 - tRiposo);  
+        const fattoreIdro = 1 + ((44 - idroPct) * 0.025);  
+        const fattoreRapp = 0.65 + (0.35 * rapporto);  
+        const oreStimateCentro = Math.max(2, 21 * fattoreTemp * fattoreIdro * fattoreRapp);  
+        oreMin = Math.max(2, Math.round(oreStimateCentro - 1));  
+        oreMax = Math.max(3, Math.round(oreStimateCentro + 1));  
+      }  
+      const fmtOre = (v) => String(v).replace('.', ',');  
 
       const oreEqTa = oreSosta * Math.pow(1.11, tRiposo - 20);  
       const wConsigliato = Math.round(240 + (12 * Math.log(Math.max(2, oreEqTa))) + Math.max(0, (idroPct - 44) * 2));  
@@ -2333,7 +2345,8 @@
       }  
 
       resLmOraRipresa.innerText = oraRipresaStr;  
-      resLmTenutaInfo.innerHTML = `<strong>Tenuta stimata a ${tRiposo}°C (${idroPct}% idro, 1:${rapporto}):</strong> ~${oreMin}-${oreMax} ore per arrivare al giusto pH (impostate: ${oreSosta}h).`;  
+      const targetPhLabel = isModalitaCella ? 'pH 4,10 (cella/spinta)' : 'pH 3,90–3,95 (mantenimento)';  
+      resLmTenutaInfo.innerHTML = `<strong>Tenuta stimata a ${tRiposo}°C (${idroPct}% idro, 1:${rapporto}):</strong> ~${fmtOre(oreMin)}–${fmtOre(oreMax)} ore per arrivare a ${targetPhLabel} (impostate: ${oreSosta}h).`;  
 
       if (wMixLm >= wConsigliato - 20) {  
         resLmWCheck.innerHTML = `<strong>Forza farina (W ${wMixLm}):</strong> ✅ Adeguata (consigliato ~W ${wConsigliato}) per reggere la sosta senza cedimenti.`;  
@@ -2341,18 +2354,22 @@
         resLmWCheck.innerHTML = `<strong>Forza farina (W ${wMixLm}):</strong> ⚠️ Un po' leggera per ${oreSosta}h (consigliato ~W ${wConsigliato}); valuta più Manitoba Oro.`;  
       }  
 
-      if (phVal >= 3.88 && phVal <= 4.02) {  
+      const phMinOk = isModalitaCella ? 4.05 : 3.88;  
+      const phMaxOk = isModalitaCella ? 4.15 : 4.02;  
+      const phTargetTxt = isModalitaCella ? '4,10' : '3,90–3,95';  
+
+      if (phVal >= phMinOk && phVal <= phMaxOk) {  
         resLmPhStatus.style.background = '#E8F5E9';  
         resLmPhStatus.style.color = '#2E7D32';  
-        resLmPhStatus.innerHTML = `<strong>🎯 Check pH (${phVal.toFixed(2)}) — Ciclo #${numCiclo}:</strong> Equilibrio ottimale (target 3,90–3,95). Pronto per l'uso o per un nuovo ciclo di mantenimento.`;  
-      } else if (phVal > 4.02) {  
+        resLmPhStatus.innerHTML = `<strong>🎯 Check pH (${phVal.toFixed(2)}) — Ciclo #${numCiclo}:</strong> Equilibrio ottimale (target ${phTargetTxt}). Pronto per ${isModalitaCella ? "l'impasto o un rinfresco successivo" : "l'uso o un nuovo ciclo di mantenimento"}.`;  
+      } else if (phVal > phMaxOk) {  
         resLmPhStatus.style.background = '#FFF8E1';  
         resLmPhStatus.style.color = '#EF6C00';  
-        resLmPhStatus.innerHTML = `<strong>⏳ Check pH (${phVal.toFixed(2)}) — Ciclo #${numCiclo}:</strong> Ancora poco maturo (> 4,02). Allunga leggermente la sosta o tieni 1-2°C più caldo.`;  
+        resLmPhStatus.innerHTML = `<strong>⏳ Check pH (${phVal.toFixed(2)}) — Ciclo #${numCiclo}:</strong> Ancora poco maturo (> ${phMaxOk.toFixed(2).replace('.', ',')}). Allunga leggermente la sosta o tieni 1–2°C più caldo.`;  
       } else {  
         resLmPhStatus.style.background = '#FFEBEE';  
         resLmPhStatus.style.color = '#C62828';  
-        resLmPhStatus.innerHTML = `<strong>⚠️ Check pH (${phVal.toFixed(2)}) — Ciclo #${numCiclo}:</strong> Tendenza acetica/acida (< 3,88). Anticipa la ripresa o riduci la temperatura di stazionamento.`;  
+        resLmPhStatus.innerHTML = `<strong>⚠️ Check pH (${phVal.toFixed(2)}) — Ciclo #${numCiclo}:</strong> Troppo acido (< ${phMinOk.toFixed(2).replace('.', ',')}). Anticipa la ripresa o riduci la temperatura di stazionamento.`;  
       }  
     }  
   
